@@ -32,9 +32,14 @@ class UserBehavior(TaskSet):
             if (self.line_count % self.num_clients == self.client_id % self.num_clients):
                 break
 
-        response = self.client.get('/', name = "tupu_searchhub", params = line, timeout=(1,10))
+        response = self.client.get(url = '/', name = "tupu_searchhub", params = line, timeout = 0.1)
+        #response = self.client.get('/', name = "tupu_searchhub", params = line, stream=True)
         if response.status_code == 0:
-            print("Get Nothing: %s" % line)
+            #print("Get Nothing: %s" % line)
+            return
+        elif response.status_code == 200:
+            #content = response.content
+            pass
         elif response.status_code != 200:
             print "URL:", response.url
             print "Response status code:", response.status_code
