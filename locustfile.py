@@ -2,6 +2,11 @@ import sys
 
 import codecs
 from locust import HttpLocust, TaskSet, task
+from locust.web import set_time_distribution
+
+# The List of time intervial for response time distribution
+TIME_DISTRIBUTION = [(0, 5), (5, 6), (6, 7), (8, 20), (20, 100), (100, 10000)]
+set_time_distribution(TIME_DISTRIBUTION)
 
 headers = {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-16LE'}
 #URL_source = "./tupu_resin_0919-small"
