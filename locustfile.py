@@ -3,14 +3,15 @@ import sys
 import codecs
 from locust import HttpLocust, TaskSet, task
 from locust.web import set_time_distribution
+from locust.xml_parse import parsexml
 
 # The List of time intervial for response time distribution
-TIME_DISTRIBUTION = [(0, 5), (5, 6), (6, 7), (8, 20), (20, 100), (100, 10000)]
+TIME_DISTRIBUTION = [(0, 20), (20, 40), (40, 60), (60, 80), (80, 100), (100, 200),(200,500),(500,1000)]
 set_time_distribution(TIME_DISTRIBUTION)
 
 headers = {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-16LE'}
 #URL_source = "./tupu_resin_0919-small"
-URL_source = "./tupu_resin_0919"
+URL_source = "./post_1222"
 class UserBehavior(TaskSet):
     def on_start(self, client_id, num_clients):
         self.line_count = 0
@@ -39,19 +40,25 @@ class UserBehavior(TaskSet):
                 break
 
         response = self.client.post("/", headers=headers, data=line)
-        if response.status_code != 200:
-            #print "User %d, %d, input %s" % (self.client_id, self.line_count, line)
-            #print "Response status code:", response.status_code
+        if response.status_code == 0:
+            #print("Get Nothing: %s" % line)
+            return
+        elif response.content and response.encoding:
             content = response.content
             decoder = codecs.getdecoder(response.encoding)
             (content,length) = decoder(content)
             content = content.replace(u'\u0a0d', '')
-            #open("test.log", "w").write(content.encode("gbk"))
-            #print "Response Content: %s" % content
+            if response.status_code != 200:
+                print "URL:", response.url
+                print "Response status code:", response.status_code
+                print "Response encoding:", response.encoding
+                print "Response Content: %s" % content
+            elif response.status_code == 200:
+                parsexml('post', line, content)
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
-    min_wait = 10
-    max_wait = 20
+    min_wait = 50
+    max_wait = 80
 
 

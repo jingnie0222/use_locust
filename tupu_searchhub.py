@@ -4,6 +4,7 @@ from urllib import unquote
 import codecs
 from locust import HttpLocust, TaskSet, task
 from locust.web import set_time_distribution
+from locust.xml_parse import parsexml
 
 # The List of time intervial for response time distribution
 TIME_DISTRIBUTION = [(0, 5), (5, 6), (6, 7), (8, 20), (20, 100), (100, 10000)]
@@ -38,24 +39,21 @@ class UserBehavior(TaskSet):
                 break
 
         response = self.client.get(url = '/', name = "tupu_searchhub", params = line, timeout = 0.1)
-        #response = self.client.get('/', name = "tupu_searchhub", params = line, stream=True)
         if response.status_code == 0:
             #print("Get Nothing: %s" % line)
             return
-        elif response.status_code == 200:
-            #content = response.content
-            pass
-        elif response.status_code != 200:
-            print "URL:", response.url
-            print "Response status code:", response.status_code
-            print "Response encoding:", response.encoding
-            if response.content and response.encoding:
-                content = response.content
-                decoder = codecs.getdecoder(response.encoding)
-                (content,length) = decoder(content)
-                content = content.replace(u'\u0a0d', '')
-                #open("test.log", "w").write(content.encode("gbk"))
+        elif response.content and response.encoding:
+            content = response.content
+            decoder = codecs.getdecoder(response.encoding)
+            (content,length) = decoder(content)
+            content = content.replace(u'\u0a0d', '')
+            if response.status_code != 200:
+                print "URL:", response.url
+                print "Response status code:", response.status_code
+                print "Response encoding:", response.encoding
                 print "Response Content: %s" % content
+            elif response.status_code == 200:
+                parsexml('get', line, content)
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
