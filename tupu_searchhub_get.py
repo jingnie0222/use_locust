@@ -38,7 +38,7 @@ class UserBehavior(TaskSet):
             if (self.line_count % self.num_clients == self.client_id % self.num_clients):
                 break
 
-        response = self.client.get(url = '/', name = "tupu_searchhub", params = line, timeout = 0.1)
+        response = self.client.get(url = '/', name = "tupu_searchhub", params = line, timeout = 0.5)
         if response.status_code == 0:
             #print("Get Nothing: %s" % line)
             return
@@ -53,11 +53,11 @@ class UserBehavior(TaskSet):
                 print "Response encoding:", response.encoding
                 print "Response Content: %s" % content
             elif response.status_code == 200:
-                parsexml('get', line, content)
+                #parsexml('get', line, content)
+                pass
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
     min_wait = 10
     max_wait = 20
-
 
